@@ -3,6 +3,27 @@ const app = express();
 
 const request = require('request');
 const cheerio = require('cheerio');
+
+app.get('/', function(req, res) {
+  request('https://www.naver.com', function(error, response, body) {
+    if(error) {
+      throw error;
+    }
+
+    // console.log(body);
+    const $ = cheerio.load(body);
+
+    let arr1 = $("div ul li a .ah_k");   // json
+    let arr2 = $("div > ul > li > a > .ah_k");  // json
+    let arr3 = $("div ul li a .ah_k").children;     // undefined
+    let arr4 = $("div > ul > li > a > .ah_k").children;     // undefined
+    let arr5 = $("div.PM_CL_realtimeKeyword_rolling ul li").text();
+    
+    console.log(arr5);
+  });
+});
+
+
 const Iconv = require('iconv').Iconv;
 const iconv = new Iconv('CP949', 'utf-8//translit//ignore');
 
