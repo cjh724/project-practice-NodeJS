@@ -1,0 +1,82 @@
+<html>
+	<head>
+        <title>jquery selector</title>
+        <script src="http://code.jquery.com/jquery-latest.min.js"></script><!--외부 CDN서버에서 최신 jQuery 배포판 불러옴-->
+        <script type="text/javascript">
+            $(document).ready(function() {
+                // id, class, tag, 속성
+                $('p').css('color', 'blue');        // tag
+                $('#a').css('color', 'red');        // id
+                $('.b').css('color', 'green');      // class
+                $('[value="alter"]').css('color', '#000000');   // 속성
+
+                // 자식선택자
+                $('ul > li').css('color', 'pink');      // 바로 아래만 선택
+
+                // 후손선택자
+                $('#firstID .secondClass').css('background', 'red');    // 해당 태그 아래에 있는 모든 태그 선택
+
+                // 형재자매 선택자(+:다음하나만 선택, ~:형제자매 중 일치하는 것 모두 선택)
+                $("div + p").css('background-color', 'yellow');     // div 바로 다음 p 선택
+                $("p ~ #div").css('background-color', 'green');     // p의 형제자매 #div 모두 선택
+            });
+        </script>
+	</head>
+
+	<body>
+        <h1>안녕하세요</h1>
+        <h2>선택자 테스트입니다</h2>
+
+        <p id='a'>연습합니다1</p>
+        <p class='b'>연습합니다2</p>
+        <p>연습합니다3</p>
+        <p value="alter">연습합니다4</p>
+
+        <ul>
+            <li>가가
+                <p>가</p>
+            </li>
+            <li>나나
+                <p>나</p>
+            </li>
+            <li>다다
+                <p>다</p>
+            </li>
+            <li>라라
+                <p>라</p>
+            </li>
+            <li>마마
+                <p>마</p>
+            </li>
+        </ul>
+
+        <div id="firstID">
+            <p>첫번째</p>
+            <div class="secondClass">
+                <p>두번째</p>
+                <div id="thirdID">
+                    <p>세번째</p>
+                </div>
+            </div>
+        </div>
+
+        <div id='container'>
+            <div>hello</div>
+            <p>안녕하세요</p>
+            <div>
+                <p>선택자 연습중입니다</p>
+            </div>
+            <div>
+
+            </div>
+            <div>
+
+            </div>
+        </div>
+
+        The <p> element that are next to each <div> elements
+        <br><br><br>
+        All <p> elements that are siblings of a <div id='div'> element
+
+    </body>
+</html>
