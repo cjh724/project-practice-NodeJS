@@ -1,5 +1,5 @@
 /*
-  pm2 start app.js / pm2 stop app.js : terminal에 log 못봄
+  pm2 start app.js / pm2 restart app.js /pm2 stop app.js : terminal에 log 못봄
   supervisor app.js : 코드 변경 때마다 crashing child 발생
 */
 const express = require('express');
@@ -60,10 +60,11 @@ app.get('/crawlingMoive', function(req, res, next) {        // complete
   });
 });
 
-
 app.get('/kakao', function(req, res, next) {
+  
   let options = {
-    url : 'https://dapi.kakao.com/v2/search/book?query=%EA%B0%80&page=10',  // 검색어:가
+    url : 'https://dapi.kakao.com/v2/search/book?query=%EC%95%8C%EA%B3%A0%EB%A6%AC%EC%A6%98',  // 검색어:알고리즘
+    // url : 'https://dapi.kakao.com/v2/search/book?query=' + req.query.key,  // 검색어:알고리즘
     headers : {
       "Authorization" : "KakaoAK 623a9837c54aedc097d449c9ace8fe29"
     }
@@ -73,9 +74,88 @@ app.get('/kakao', function(req, res, next) {
     if(error) {
       throw error;
     }
+    console.log("url= " + options.url);
 
-    res.json(html);
+    const searchArray = ["가", "나", "다", "라", "마", "바", "사", "아", "자", "차", "카", "파", "타", "하"]; // utf-8로 변환 필요
+    let authors = new Array(),
+        barcode = new Array(),
+        category = new Array(),
+        contents = new Array(),
+        datetime = new Array(),
+        ebook_barcode = new Array(),
+        isbn = new Array(),
+        price = new Array(),
+        publisher = new Array(),
+        sale_price = new Array(),
+        sale_yn = new Array(),
+        status = new Array(),
+        thumbnail = new Array(),
+        title = new Array(),
+        translators = new Array(),
+        url = new Array();
+    let is_end, pageable_count, total_count;
 
+    var obj = JSON.parse(html);   // String -> object
+    // console.log("타입확인 : ", typeof obj);
+    // console.log("meta : ", obj.meta);
+    // console.log("is_end : ", obj.meta.is_end);
+    // console.log("pcount : ", obj.meta.pageable_count);
+    // console.log("tcount : ", obj.meta.total_count);
+
+    // console.log("Documents length : ", obj.documents.length);
+    // console.log("첫번째 작가 : ", obj.documents[0].authors, obj.documents[0].authors.length);
+
+    for(let i=0; i<obj.documents.length; i++) {
+      // documents
+      authors.push(obj.documents[i].authors);
+      barcode.push(obj.documents[i].barcode);
+      category.push(obj.documents[i].category);
+      contents.push(obj.documents[i].contents);
+      datetime.push(obj.documents[i].datetime);
+      ebook_barcode.push(obj.documents[i].ebook_barcode);
+      isbn.push(obj.documents[i].isbn);
+      price.push(obj.documents[i].price);
+      publisher.push(obj.documents[i].publisher);
+      sale_price.push(obj.documents[i].sale_price);
+      sale_yn.push(obj.documents[i].sale_yn);
+      status.push(obj.documents[i].status);
+      thumbnail.push(obj.documents[i].thumbnail);
+      title.push(obj.documents[i].title);
+      translators.push(obj.documents[i].translators);
+      url.push(obj.documents[i].url);
+    }
+
+    // meta
+    is_end = obj.meta.is_end;                 // 마지막페이지 여부(T/F)
+    pageable_count = obj.meta.pageable_count; // total_count 중 노출가능 문서수
+    total_count = obj.meta.total_count;       // 검색어에 검색된 문서수
+
+    var resultJSON = {    // 검색어 "알고리즘"으로 할 시(다른것은 default)
+      // meta
+      total_count : total_count,
+      pageable_count : pageable_count,
+      is_end : is_end,
+
+      // documents
+      authors : authors,
+      barcode : barcode,
+      category : category,
+      contents : contents,
+      datetime : datetime,
+      ebook_barcode : ebook_barcode,
+      isbn : isbn,
+      price : price,
+      publisher : publisher,
+      sale_price : sale_price,
+      sale_yn : sale_yn,
+      status : status,
+      thumbnail : thumbnail,
+      title : title,
+      translators : translators,
+      url : url
+    };
+
+    res.json(resultJSON);
   });
 });
 
@@ -130,6 +210,29 @@ app.get('/crawlingKyobo', function(req, res, next) {    // html만 가지고옴
     res.json(result);
   });
 });
+
+
+const fs = require('fs');
+const csv = require('fast-csv');
+const stream = fs.createReadStream("test2.csv", {encoding : "utf8"});
+
+app.get('/readCSV', function(req, res, next) {
+  
+  let csvStream = csv()
+      .on("data", function(data) {
+        // console.log(data[1]);
+        let result = euckr2utf8.convert(data[1]).toString();
+        console.log(result);
+      })
+      .on("end", function() {
+        console.log("done");
+      });
+  
+  stream.pipe(csvStream);
+
+
+});
+
 
 module.exports = app;
 
