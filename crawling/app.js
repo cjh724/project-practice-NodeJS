@@ -13,6 +13,15 @@ const urlencode = require('urlencode'); // 한글을 UTF-8로 변경(URL Encode)
 // 사용자 정의 모듈
 const makejsonbook = require('./usermodule/makejsonbook.js');
 
+// MySQL 연동
+const mysql = require('mysql');
+const connection = mysql.createConnection( {
+  host : 'localhost',
+  user : 'root',
+  password : 'root',
+  database : 'novel'
+});
+
 app.get('/naverMain', function(req, res) {    // 미완성
   request('https://www.naver.com', function(error, response, body) {
     if(error) {
@@ -62,6 +71,16 @@ app.get('/crawlingMoive', function(req, res, next) {        // complete
     }
 
     res.json(resultArr);
+  });
+});
+
+app.get('/dbtest', function(req, res, next) {
+  connection.query('select * from book;', function(error, results, fields) {
+    if(error) {
+      throw error;
+    }
+
+    res.json(results);      // table에 있는 책정보 json 출력
   });
 });
 
