@@ -8,6 +8,11 @@ const app = express();
 const cheerio = require('cheerio');   // HTML 데이터 parsing
 const request = require('request');   // cheerio에서 parsing할 데이터 가져옴
 
+const urlencode = require('urlencode'); // 한글을 UTF-8로 변경(URL Encode)
+
+// 사용자 정의 모듈
+const makejsonbook = require('./usermodule/makejsonbook.js');
+
 app.get('/naverMain', function(req, res) {    // 미완성
   request('https://www.naver.com', function(error, response, body) {
     if(error) {
@@ -58,6 +63,40 @@ app.get('/crawlingMoive', function(req, res, next) {        // complete
 
     res.json(resultArr);
   });
+});
+
+app.get('/kakao/all', function(req, res, next) {
+  const searchArray = ["가", "나", "다", "라", "마"/*, "바", "사", "아", "자", "차", "카", "파", "타", "하"*/];
+  let jsonList = [];
+  
+  for(let i = 0; i < searchArray.length; i++) {
+    // var key = searchArray[i];
+    var urlencodekey = urlencode(searchArray[i]);
+    var options = {
+      // url : '/kakao?key=' + key,
+      url : 'https://dapi.kakao.com/v2/search/book?query=' + urlencodekey + '&page=50&size=50',
+      headers : {
+        "Authorization" : "KakaoAK 623a9837c54aedc097d449c9ace8fe29"
+      }
+    };
+    
+    request(options, function(error, response, html) {
+      if(error) {
+        throw error;
+      }
+
+      var result = makejsonbook(html);
+      console.log("검색어 : " + searchArray[i] + ", 사용자 정의 모듈 출력 : " + result.title);
+
+      // TODO
+      // 1. insert MySQL Table
+      // jsonList.add(result);
+
+      // 2. init variable
+
+    });
+  }
+  res.send("success");
 });
 
 app.get('/kakao', function(req, res, next) {
