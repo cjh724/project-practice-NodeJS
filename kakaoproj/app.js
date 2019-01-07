@@ -1,15 +1,15 @@
 // npm install express request urlencode
 const express = require('express');
-const request = require('request');     // cheerio에서 parsing할 데이터 가져옴
+const request = require('request');
 const urlencode = require('urlencode'); // 한글을 UTF-8로 변경(URL Encode)
 const app = express();
 
 app.get('/getBook', function(req, res, next) {
-    // 1. python에서 책제목 가지고 올 예정
+    // 1. android에서 책제목 가지고 올 예정
     const bookTitle = ["해를품은달", "위대한개츠비", "나미야잡화점의기적"];       // 예시로 일단 세권만
 
     for(let i=0; i<bookTitle.length; i++) {
-        var urlencodekey = urlencode(bookTitle[i]);
+        let urlencodekey = urlencode(bookTitle[i]);
 
         let options = {
             url : 'https://dapi.kakao.com/v3/search/book?query=' + urlencodekey + '&page=1&size=1',
@@ -23,18 +23,18 @@ app.get('/getBook', function(req, res, next) {
                 throw error;
             }
 
-            var obj = JSON.parse(html);   // String -> object
+            let obj = JSON.parse(html);   // String -> object
             let title = new Array(),
                 contents = new Array(),
                 thumbnail = new Array();
 
             for(let j=0; j<obj.documents.length; j++) {
-                title.push(bookTitle[i]);       // phthon에서 가져온 책제목을 그대로 씀
+                title.push(bookTitle[i]);       // android에서 가져온 책제목을 그대로 씀
                 contents.push(obj.documents[j].contents);
                 thumbnail.push(obj.documents[j].thumbnail);
             }
 
-            var resultJSON = {
+            let resultJSON = {
                 title : title,
                 contents : contents,
                 thumbnail : thumbnail
@@ -44,6 +44,7 @@ app.get('/getBook', function(req, res, next) {
             console.log(resultJSON.title + " ===== " + resultJSON.contents + " ///// " +resultJSON.thumbnail);
         });
     }
+
     res.json("success");
 });
 
